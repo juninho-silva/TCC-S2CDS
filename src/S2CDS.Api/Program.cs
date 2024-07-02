@@ -1,5 +1,7 @@
-using Microsoft.EntityFrameworkCore;
-using S2CDS.Api.Infrastruture.Data;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
+using S2CDS.Api.Configurations;
+using S2CDS.Api.Infrastruture.Repositories.Campaign;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,11 +12,21 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var connectionStringMySql = builder.Configuration.GetConnectionString("MySqlConnection");
+// Adicione as configurações do MongoDB
+builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("MongoDB"));
 
-//builder.Services.AddDbContext<ApiDbContext>(options =>
-//    options.UseMySql(connectionStringMySql, ServerVersion.Parse("10.4.22-MariaDB"))
-//);
+// Registre o cliente do MongoDB
+builder.Services.AddSingleton<IMongoClient, MongoClient>(sp => new MongoClient(builder.Configuration.GetValue<string>("MongoDB:ConnectionString")));
+
+// Registre o serviço que utiliza o MongoDB
+builder.Services.AddScoped<IMongoDatabase>(sp =>
+{
+    var settings = sp.GetRequiredService<IOptions<MongoDBSettings>>().Value;
+    var client = sp.GetRequiredService<IMongoClient>();
+    return client.GetDatabase(settings.DatabaseName);
+});
+
+builder.Services.AddScoped<ICampaignRepository, CampaignRepository>();
 
 var app = builder.Build();
 

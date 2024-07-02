@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "tcc.sistema.captacao.campanha.sangue.api": {
+    "S2CDS.Api": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using S2CDS.Api.Infrastruture.Repositories.Campaign;
 
 namespace S2CDS.Api.Controllers
 {
@@ -8,36 +7,50 @@ namespace S2CDS.Api.Controllers
     [ApiController]
     public class CampaignController : ControllerBase
     {
-        // GET: api/<CampaignController>
+        private readonly ICampaignRepository _repository;
+
+        public CampaignController(ICampaignRepository repository)
+        {
+            _repository = repository;
+        }
+
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<IActionResult> Get()
         {
-            return new string[] { "value1", "value2" };
+            var entities = await _repository.GetAllAsync();
+            return Ok(entities);
         }
 
-        // GET api/<CampaignController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<IActionResult> Get(string id)
         {
-            return "value";
+            var entity = await _repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                return NotFound();
+            }
+            return Ok(entity);
         }
 
-        // POST api/<CampaignController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Post([FromBody] CampaignEntity entity)
         {
+            await _repository.AddAsync(entity);
+            return CreatedAtAction(nameof(Get), new { id = Guid.NewGuid() }, entity);
         }
 
-        // PUT api/<CampaignController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<IActionResult> Put(string id, [FromBody] CampaignEntity entity)
         {
+            await _repository.UpdateAsync(id, entity);
+            return NoContent();
         }
 
-        // DELETE api/<CampaignController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(string id)
         {
+            await _repository.DeleteAsync(id);
+            return NoContent();
         }
     }
 }
