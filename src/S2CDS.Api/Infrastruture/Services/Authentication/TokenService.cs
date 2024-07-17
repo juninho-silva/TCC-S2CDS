@@ -5,15 +5,30 @@ using System.Text;
 
 namespace S2CDS.Api.Infrastruture.Services.Authentication
 {
+    /// <summary>
+    /// Token Service
+    /// </summary>
     public class TokenService
     {
+        /// <summary>
+        /// The secret
+        /// </summary>
         private readonly string _secret;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TokenService"/> class.
+        /// </summary>
+        /// <param name="secret">The secret.</param>
         public TokenService(string secret)
         {
             _secret = secret;
         }
 
+        /// <summary>
+        /// Generates the token.
+        /// </summary>
+        /// <param name="username">The username.</param>
+        /// <returns></returns>
         public string GenerateToken(string username)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
