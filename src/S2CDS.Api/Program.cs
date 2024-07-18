@@ -5,6 +5,7 @@ using MongoDB.Driver;
 using S2CDS.Api.Configurations;
 using S2CDS.Api.Infrastruture.Repositories.Campaign;
 using S2CDS.Api.Infrastruture.Services.Authentication;
+using S2CDS.Api.Infrastruture.Services.Smtp;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,7 +32,8 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddSingleton<TokenService>(sp => new TokenService(secret));
+builder.Services.AddSingleton(s => new TokenService(secret));
+builder.Services.AddTransient<EmailService>();
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -41,7 +43,7 @@ builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("Mo
 
 builder.Services.AddSingleton<IMongoClient, MongoClient>(sp => new MongoClient(builder.Configuration.GetValue<string>("MongoDB:ConnectionString")));
 
-builder.Services.AddScoped<IMongoDatabase>(sp =>
+builder.Services.AddScoped(sp =>
 {
     var settings = sp.GetRequiredService<IOptions<MongoDBSettings>>().Value;
     var client = sp.GetRequiredService<IMongoClient>();

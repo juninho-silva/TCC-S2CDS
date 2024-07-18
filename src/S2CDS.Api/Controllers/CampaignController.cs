@@ -1,29 +1,31 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using S2CDS.Api.Infrastruture.Repositories.Campaign;
+using S2CDS.Api.Infrastruture.Services.Smtp;
 
 namespace S2CDS.Api.Controllers
 {
     /// <summary>
     /// Campaign Controller
     /// </summary>
-    /// <seealso cref="Microsoft.AspNetCore.Mvc.ControllerBase" />
+    /// <seealso cref="ControllerBase" />
     [Route("api/[controller]")]
     [ApiController]
     public class CampaignController : ControllerBase
     {
-        /// <summary>
-        /// The repository
-        /// </summary>
         private readonly ICampaignRepository _repository;
+        private readonly EmailService _emailService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CampaignController"/> class.
         /// </summary>
         /// <param name="repository">The repository.</param>
-        public CampaignController(ICampaignRepository repository)
+        public CampaignController(
+            ICampaignRepository repository,
+            EmailService emailService)
         {
             _repository = repository;
+            _emailService = emailService;
         }
 
         /// <summary>
@@ -65,6 +67,7 @@ namespace S2CDS.Api.Controllers
         public async Task<IActionResult> Post([FromBody] CampaignEntity entity)
         {
             await _repository.AddAsync(entity);
+            await _emailService.SendEmailAsync(entity.Email, "Fulano", "Nova Campanha");
             return CreatedAtAction(nameof(Get), new { id = Guid.NewGuid() }, entity);
         }
 
