@@ -4,6 +4,8 @@ using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using S2CDS.Api.Configurations;
 using S2CDS.Api.Infrastruture.Repositories.Campaign;
+using S2CDS.Api.Infrastruture.Repositories.Donor;
+using S2CDS.Api.Infrastruture.Repositories.User;
 using S2CDS.Api.Infrastruture.Services.Authentication;
 using S2CDS.Api.Infrastruture.Services.Smtp;
 using System.Text;
@@ -32,6 +34,11 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Telemetria
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
 builder.Services.AddSingleton(s => new TokenService(secret));
 builder.Services.AddTransient<EmailService>();
 builder.Services.AddAuthorization();
@@ -51,6 +58,8 @@ builder.Services.AddScoped(sp =>
 });
 
 builder.Services.AddScoped<ICampaignRepository, CampaignRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IDonorRepository, DonorRepository>();
 
 var app = builder.Build();
 

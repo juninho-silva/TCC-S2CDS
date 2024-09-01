@@ -8,22 +8,38 @@ namespace S2CDS.Api.Infrastruture.Repositories.Campaign
     /// </summary>
     public class CampaignEntity
     {
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
         /// <summary>
         /// Gets or sets the name.
         /// </summary>
-        [BsonElement("name")]
-        public string Name { get; set; }
-
+        [BsonElement("title")]
+        public string Title { get; set; }
         /// <summary>
-        /// Gets or sets the age.
+        /// Gets or sets the description.
         /// </summary>
-        [BsonElement("age")]
-        public int Age { get; set; }
-
+        [BsonElement("description")]
+        public string Description { get; set; }
+        /// <summary>
+        /// Gets or sets the type of the blood.
+        /// </summary>
+        [BsonElement("bloodType")]
+        public string BloodType { get; set; }
         /// <summary>
         /// Gets or sets the email.
         /// </summary>
-        [BsonElement("email")]
-        public string Email { get; set; }
+        [BsonElement("userId")]
+        public string UserId { get; set; }
+        /// <summary>
+        /// Gets or sets the created at.
+        /// </summary>
+        [BsonElement("createdAt")]
+        public DateTime CreatedAt {get; set; }
+        /// <summary>
+        /// Gets or sets the updated at.
+        /// </summary>
+        [BsonElement("updateAt")]
+        public DateTime UpdatedAt { get; set; }
     }
 }

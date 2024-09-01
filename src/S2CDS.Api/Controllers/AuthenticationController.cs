@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using S2CDS.Api.Infrastruture.Services.Authentication;
-using S2CDS.Api.ViewModels.Authentication;
+using S2CDS.Api.Dtos.Authentication;
+using S2CDS.Api.Business;
+using S2CDS.Api.Infrastruture.Repositories.User;
 
 namespace S2CDS.Api.Controllers
 {
@@ -8,19 +10,21 @@ namespace S2CDS.Api.Controllers
     /// Authentication Controller
     /// </summary>
     /// <seealso cref="Microsoft.AspNetCore.Mvc.ControllerBase" />
-    [Route("api/[controller]")]
+    [Route("api/authentication")]
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
-        private readonly TokenService _tokenService;
+        private readonly AuthBusiness _authBusiness;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthenticationController"/> class.
         /// </summary>
         /// <param name="tokenService">The token service.</param>
-        public AuthenticationController(TokenService tokenService)
+        public AuthenticationController(TokenService tokenService,
+            IUserRepository userRepository,
+            ILogger<AuthBusiness> logger)
         {
-            _tokenService = tokenService;
+            _authBusiness = new AuthBusiness(userRepository, tokenService, logger);
         }
 
         /// <summary>
@@ -28,15 +32,16 @@ namespace S2CDS.Api.Controllers
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns></returns>
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginViewModel request)
+        [HttpPost]
+        public async Task<IActionResult> GetToken([FromBody] AuthenticationDto request)
         {
-            if (request.Email.Equals("fulano@gmail.com") && request.Password.Equals("123"))
+            var result = await _authBusiness.GenerateToken(request);
+
+            if (result.Equals("Usuário não encontrado!") || result.Equals("Senha incorreta!"))
             {
-                var token = _tokenService.GenerateToken(request.Email);
-                return Ok(new { token });
+                return Unauthorized(new { result });
             }
-            return Unauthorized();
+            return Ok(new { result });
         }
     }
 }

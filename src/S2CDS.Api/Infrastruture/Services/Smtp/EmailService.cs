@@ -41,8 +41,14 @@ namespace S2CDS.Api.Infrastruture.Services.Smtp
             mailMessage.To.Add(new MailAddress(toEmail));
 
             using var client = new SmtpClient(smtpSettings.Server, smtpSettings.Port);
+
+#if DEBUG
+            client.Credentials = CredentialCache.DefaultNetworkCredentials;
+            client.EnableSsl = false;
+#else
             client.Credentials = new NetworkCredential(smtpSettings.Username, smtpSettings.Password);
             client.EnableSsl = true;
+#endif
 
             await client.SendMailAsync(mailMessage);
         }
