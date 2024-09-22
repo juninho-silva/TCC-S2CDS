@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace S2CDS.Api.Dtos.Campaign
+namespace S2CDS.Api.Dtos.v1.Campaign
 {
     /// <summary>
     /// Campaign View Model

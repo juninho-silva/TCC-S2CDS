@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace S2CDS.Api.Dtos.Donor.Data
+namespace S2CDS.Api.Dtos.v1.Donor.Data
 {
     /// <summary>
     /// Full Name Data transfer object

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace S2CDS.Api.Dtos.Authentication
+namespace S2CDS.Api.Dtos.v1.Authentication
 {
     /// <summary>
     /// Authentication Data Transter Object

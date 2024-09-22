@@ -1,28 +1,28 @@
-﻿using S2CDS.Api.Dtos.Donor;
+﻿using S2CDS.Api.Dtos.v1.Donor;
 using S2CDS.Api.Helpers;
 using S2CDS.Api.Infrastruture.Repositories.Donor;
 using S2CDS.Api.Infrastruture.Repositories.User;
 
-namespace S2CDS.Api.Business
+namespace S2CDS.Api.Services.v1
 {
     /// <summary>
     /// Donor
     /// </summary>
-    public class DonorBusiness
+    public class DonorService
     {
-        private readonly ILogger<DonorBusiness> _logger;
+        private readonly ILogger<DonorService> _logger;
         private readonly IUserRepository _userRepository;
         private readonly IDonorRepository _donorRepository;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DonorBusiness"/> class.
+        /// Initializes a new instance of the <see cref="DonorService"/> class.
         /// </summary>
         /// <param name="userRepository">The user repository.</param>
         /// <param name="donorRepository">The donor repository.</param>
-        public DonorBusiness(
+        public DonorService(
             IUserRepository userRepository,
             IDonorRepository donorRepository,
-            ILogger<DonorBusiness> logger
+            ILogger<DonorService> logger
             )
         {
             _logger = logger;

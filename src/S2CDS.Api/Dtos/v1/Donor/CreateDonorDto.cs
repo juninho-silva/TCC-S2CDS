@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
-using S2CDS.Api.Dtos.Donor.Data;
+using S2CDS.Api.Dtos.v1.Donor.Data;
 
-namespace S2CDS.Api.Dtos.Donor
+namespace S2CDS.Api.Dtos.v1.Donor
 {
     /// <summary>
     /// Create User Donor Data

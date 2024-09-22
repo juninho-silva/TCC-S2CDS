@@ -1,24 +1,24 @@
-﻿using S2CDS.Api.Dtos.Authentication;
+﻿using S2CDS.Api.Dtos.v1.Authentication;
 using S2CDS.Api.Helpers;
 using S2CDS.Api.Infrastruture.Repositories.User;
 using S2CDS.Api.Infrastruture.Services.Authentication;
 
-namespace S2CDS.Api.Business
+namespace S2CDS.Api.Services.v1
 {
     /// <summary>
     /// AuthBusiness
     /// </summary>
-    public class AuthBusiness
+    public class AuthService
     {
-        private readonly ILogger<AuthBusiness> _logger;
+        private readonly ILogger<AuthService> _logger;
         private readonly IUserRepository _userRepository;
         private readonly TokenService _tokenService;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AuthBusiness"/> class.
+        /// Initializes a new instance of the <see cref="AuthService"/> class.
         /// </summary>
         /// <param name="userRepository">The user repository.</param>
-        public AuthBusiness(IUserRepository userRepository, TokenService tokenService, ILogger<AuthBusiness> logger)
+        public AuthService(IUserRepository userRepository, TokenService tokenService, ILogger<AuthService> logger)
         {
             _logger = logger;
             _userRepository = userRepository;

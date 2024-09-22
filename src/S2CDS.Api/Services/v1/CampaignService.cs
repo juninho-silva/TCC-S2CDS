@@ -1,29 +1,29 @@
-﻿using S2CDS.Api.Dtos.Campaign;
+﻿using S2CDS.Api.Dtos.v1.Campaign;
 using S2CDS.Api.Helpers;
 using S2CDS.Api.Infrastruture.Repositories.Campaign;
 using S2CDS.Api.Infrastruture.Repositories.Donor;
 using S2CDS.Api.Infrastruture.Services.Smtp;
 
-namespace S2CDS.Api.Business
+namespace S2CDS.Api.Services.v1
 {
     /// <summary>
     /// Campaign Business
     /// </summary>
-    public class CampaignBusiness
+    public class CampaignService
     {
         private readonly EmailService _emailService;
-        private readonly ILogger<CampaignBusiness> _logger;
+        private readonly ILogger<CampaignService> _logger;
         private readonly IDonorRepository _donorRepository;
         private readonly ICampaignRepository _campaignRepository;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CampaignBusiness"/> class.
+        /// Initializes a new instance of the <see cref="CampaignService"/> class.
         /// </summary>
         /// <param name="donorRepository">The donor repository.</param>
         /// <param name="campaignRepository">The campaign repository.</param>
-        public CampaignBusiness(IDonorRepository donorRepository, 
-            ICampaignRepository campaignRepository, 
-            ILogger<CampaignBusiness> logger,
+        public CampaignService(IDonorRepository donorRepository,
+            ICampaignRepository campaignRepository,
+            ILogger<CampaignService> logger,
             IConfiguration configuration)
         {
             _emailService = new EmailService(configuration);

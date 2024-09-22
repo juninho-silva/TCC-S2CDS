@@ -1,32 +1,32 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using S2CDS.Api.Business;
-using S2CDS.Api.Dtos.Donor;
+using S2CDS.Api.Dtos.v1.Campaign;
+using S2CDS.Api.Infrastruture.Repositories.Campaign;
 using S2CDS.Api.Infrastruture.Repositories.Donor;
-using S2CDS.Api.Infrastruture.Repositories.User;
+using S2CDS.Api.Services.v1;
 
-namespace S2CDS.Api.Controllers
+namespace S2CDS.Api.Controllers.v1
 {
     /// <summary>
-    /// Donor Controller
+    /// Campaign Controller
     /// </summary>
     /// <seealso cref="ControllerBase" />
-    [Route("api/donor")]
+    [Route("api/v1/campaign")]
     [ApiController]
-    public class DonorController : ControllerBase
+    public class CampaignController : ControllerBase
     {
-        private readonly DonorBusiness donorBusiness;
-
+        private readonly CampaignService _campaignBusiness;
         /// <summary>
-        /// Initializes a new instance of the <see cref="DonorController"/> class.
+        /// Initializes a new instance of the <see cref="CampaignController"/> class.
         /// </summary>
-        /// <param name="userRepository">The user repository.</param>
-        /// <param name="donorRepository">The donor repository.</param>
-        public DonorController(IUserRepository userRepository, 
-            IDonorRepository donorRepository, 
-            ILogger<DonorBusiness> logger)
+        /// <param name="campaignRepository">The repository.</param>
+        public CampaignController(
+            ICampaignRepository campaignRepository,
+            IDonorRepository donorRepository,
+            ILogger<CampaignService> logger,
+            IConfiguration configuration)
         {
-            donorBusiness = new DonorBusiness(userRepository, donorRepository, logger);
+            _campaignBusiness = new CampaignService(donorRepository, campaignRepository, logger, configuration);
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace S2CDS.Api.Controllers
         [Authorize]
         public async Task<IActionResult> Get()
         {
-            List<DonorEntity> entities = await donorBusiness.GetAll();
+            var entities = await _campaignBusiness.GetAll();
             return Ok(entities);
         }
 
@@ -48,9 +48,13 @@ namespace S2CDS.Api.Controllers
         /// <returns></returns>
         [HttpGet("{id}")]
         [Authorize]
-        public async Task<IActionResult> Get([FromRoute] string id)
+        public async Task<IActionResult> Get(string id)
         {
-            var entity = await donorBusiness.GetById(id);
+            var entity = await _campaignBusiness.GetById(id);
+            if (entity == null)
+            {
+                return NotFound();
+            }
             return Ok(entity);
         }
 
@@ -60,11 +64,11 @@ namespace S2CDS.Api.Controllers
         /// <param name="entity">The entity.</param>
         /// <returns></returns>
         [HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> Post([FromBody] CreateDonorDto entity)
+        [Authorize]
+        public async Task<IActionResult> Post([FromBody] CampaignDto entity)
         {
-            await donorBusiness.Create(entity);
-            return Created(nameof(Post), new { message = "Doador criado!" });
+            await _campaignBusiness.Create(entity);
+            return Created(nameof(Post), new { message = "Campanha criado!" });
         }
 
         /// <summary>
@@ -75,9 +79,9 @@ namespace S2CDS.Api.Controllers
         /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> Put([FromRoute] string id, [FromBody] CreateDonorDto entity)
+        public async Task<IActionResult> Put(string id, [FromBody] CampaignDto entity)
         {
-            await donorBusiness.Update(id, entity);
+            await _campaignBusiness.Update(id, entity);
             return NoContent();
         }
 
@@ -88,17 +92,17 @@ namespace S2CDS.Api.Controllers
         /// <returns></returns>
         [HttpDelete("{id}")]
         [Authorize]
-        public async Task<IActionResult> Delete([FromRoute] string id)
+        public async Task<IActionResult> Delete(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
                 return BadRequest(new { message = "O id deve ser informado" });
 
-            var (isSuccess, message) = await donorBusiness.Delete(id);
+            var (isSuccess, message) = await _campaignBusiness.Delete(id);
 
             if (isSuccess)
                 return Ok();
 
-            return BadRequest(message);
+            return BadRequest(new { message });
         }
     }
 }
