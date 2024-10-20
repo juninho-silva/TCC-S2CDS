@@ -1,15 +1,19 @@
-﻿using S2CDS.Api.Dtos.v1.Donor;
+﻿using AutoMapper;
+using S2CDS.Api.Dtos.v1.Donor.Requests;
+using S2CDS.Api.Dtos.v1.Donor.Responses;
 using S2CDS.Api.Helpers;
-using S2CDS.Api.Infrastruture.Repositories.Donor;
-using S2CDS.Api.Infrastruture.Repositories.User;
+using S2CDS.Api.Infrastructure.Repositories.Donor;
+using S2CDS.Api.Infrastructure.Repositories.User;
+using S2CDS.Api.Services.v1.Interfaces;
 
 namespace S2CDS.Api.Services.v1
 {
     /// <summary>
-    /// Donor
+    /// Donor Service
     /// </summary>
-    public class DonorService
+    public class DonorService : IDonorService
     {
+        private readonly IMapper _mapper;
         private readonly ILogger<DonorService> _logger;
         private readonly IUserRepository _userRepository;
         private readonly IDonorRepository _donorRepository;
@@ -22,9 +26,11 @@ namespace S2CDS.Api.Services.v1
         public DonorService(
             IUserRepository userRepository,
             IDonorRepository donorRepository,
-            ILogger<DonorService> logger
+            ILogger<DonorService> logger,
+            IMapper mapper
             )
         {
+            _mapper = mapper;
             _logger = logger;
             _userRepository = userRepository;
             _donorRepository = donorRepository;
@@ -35,40 +41,27 @@ namespace S2CDS.Api.Services.v1
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns></returns>
-        public async Task<bool> Create(CreateDonorDto request)
+        public async Task<bool> Create(CreateDonorRequest request)
         {
             try
             {
+                _logger.LogInformation($"[{nameof(DonorService)}][Create] - starting");
+
                 UserEntity newUser = await CreateUser(request);
 
-                DonorEntity donor = new()
-                {
-                    BloodType = request.BloodType,
-                    FullName = new()
-                    {
-                        First = request.FullName.First,
-                        Last = request.FullName.Last,
-                    },
-                    Gender = request.Gender,
-                    UserId = newUser.Id,
-                    BirthDate = request.BirthDate.ToShortDateString(),
-                    Contact = new()
-                    {
-                        Email = request.Contact.Email,
-                        Phone1 = request.Contact.Phone1,
-                        Phone2 = request.Contact.Phone2,
-                    },
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                };
+                var donor = _mapper.Map<DonorEntity>(request);
+
+                donor.UserId = newUser.Id;
 
                 await _donorRepository.AddAsync(donor);
+
+                _logger.LogInformation($"[{nameof(DonorService)}][Create] - finish");
 
                 return true;
             }
             catch (Exception err)
             {
-                _logger.LogError($"{err.Message}");
+                _logger.LogError($"[{nameof(DonorService)}][Create] - failure, error: {err.Message}");
                 throw;
             }
         }
@@ -78,28 +71,32 @@ namespace S2CDS.Api.Services.v1
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns></returns>
-        public async Task<bool> Update(string id, CreateDonorDto request)
+        public async Task<bool> Update(string id, CreateDonorRequest request)
         {
             try
             {
+                _logger.LogInformation($"[{nameof(DonorService)}][Update] - starting");
+
                 var donor = await _donorRepository.GetByIdAsync(id);
 
                 if (donor is null)
                 {
-                    _logger.LogWarning("Doador não existe!");
+                    _logger.LogWarning($"[{nameof(DonorService)}][Update] - record not found");
                     return false;
                 }
 
-                donor.BirthDate = request.BirthDate.ToString("dd/mm/yyyy");
+                donor.BirthDate = request.BirthDate.ToShortDateString();
                 donor.UpdatedAt = DateTime.UtcNow;
 
                 await _donorRepository.UpdateAsync(id, donor);
+
+                _logger.LogInformation($"[{nameof(DonorService)}][Update] - finish");
 
                 return true;
             }
             catch (Exception err)
             {
-                _logger.LogError($"{err.Message}");
+                _logger.LogError($"[{nameof(DonorService)}][Update] - failure, error: {err.Message}");
                 throw;
             }
         }
@@ -109,18 +106,53 @@ namespace S2CDS.Api.Services.v1
         /// </summary>
         /// <param name="id">The identifier.</param>
         /// <returns></returns>
-        public async Task<DonorEntity> GetById(string id)
+        public async Task<DonorResponse> GetById(string id)
         {
-            return await _donorRepository.GetByIdAsync(id);
+            try
+            {
+                _logger.LogInformation($"[{nameof(DonorService)}][GetById] - starting");
+
+                var donor = await _donorRepository.GetByIdAsync(id);
+
+                if (donor is null)
+                {
+                    _logger.LogWarning($"[{nameof(DonorService)}][GetById] - record not found!");
+                    return null;
+                }
+
+                _logger.LogInformation($"[{nameof(DonorService)}][GetById] - finish");
+
+                return _mapper.Map<DonorResponse>(donor);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"[{nameof(DonorService)}][GetById] - failure, error: {err.Message}");
+                throw;
+            }
+            
         }
 
         /// <summary>
         /// Gets all.
         /// </summary>
         /// <returns></returns>
-        public async Task<List<DonorEntity>> GetAll()
+        public async Task<List<DonorResponse>> GetAll()
         {
-            return (await _donorRepository.GetAllAsync())?.ToList();
+            try
+            {
+                _logger.LogInformation($"[{nameof(DonorService)}][GetAll] - starting");
+
+                var donors = (await _donorRepository.GetAllAsync())?.ToList();
+
+                _logger.LogInformation($"[{nameof(DonorService)}][GetAll] - finish");
+
+                return _mapper.Map<List<DonorResponse>>(donors);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"[{nameof(DonorService)}][GetAll] - failure, error: {err.Message}");
+                throw;
+            }
         }
 
         /// <summary>
@@ -132,11 +164,13 @@ namespace S2CDS.Api.Services.v1
         {
             try
             {
+                _logger.LogInformation($"[{nameof(DonorService)}][Delete] - starting");
+
                 DonorEntity donor = await _donorRepository.GetByIdAsync(id);
 
                 if (donor is null)
                 {
-                    _logger.LogWarning("Usuário não encontrado!");
+                    _logger.LogWarning($"[{nameof(DonorService)}][Delete] - Usuário não encontrado!");
                     return new(false, "Usuário não encontrado!");
                 }
 
@@ -144,17 +178,19 @@ namespace S2CDS.Api.Services.v1
 
                 await _userRepository.DeleteAsync(donor.UserId);
 
+                _logger.LogInformation($"[{nameof(DonorService)}][Delete] - finish");
+
                 return new(true, string.Empty);
 
             }
             catch (Exception err)
             {
-                _logger.LogError($"{err.Message}");
+                _logger.LogError($"[{nameof(DonorService)}][Delete] - failure, error: {err.Message}");
                 throw;
             }
         }
 
-        private async Task<UserEntity> CreateUser(CreateDonorDto request)
+        private async Task<UserEntity> CreateUser(CreateDonorRequest request)
         {
             UserEntity newUser = new()
             {

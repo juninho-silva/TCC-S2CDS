@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using S2CDS.Api.Infrastruture.Services.Authentication;
-using S2CDS.Api.Infrastruture.Repositories.User;
-using S2CDS.Api.Services.v1;
 using S2CDS.Api.Dtos.v1.Authentication;
+using S2CDS.Api.Services.v1.Interfaces;
 
 namespace S2CDS.Api.Controllers.v1
 {
@@ -14,17 +12,15 @@ namespace S2CDS.Api.Controllers.v1
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
-        private readonly AuthService _authBusiness;
+        private readonly IAuthService _authService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthenticationController"/> class.
         /// </summary>
-        /// <param name="tokenService">The token service.</param>
-        public AuthenticationController(TokenService tokenService,
-            IUserRepository userRepository,
-            ILogger<AuthService> logger)
+        /// <param name="authService">The authentication service.</param>
+        public AuthenticationController(IAuthService authService)
         {
-            _authBusiness = new AuthService(userRepository, tokenService, logger);
+            _authService = authService;
         }
 
         /// <summary>
@@ -33,14 +29,27 @@ namespace S2CDS.Api.Controllers.v1
         /// <param name="request">The request.</param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> GetToken([FromBody] AuthenticationDto request)
+        public async Task<IActionResult> GetToken([FromBody] AuthenticationRequest request)
         {
-            var result = await _authBusiness.GenerateToken(request);
+            var result = await _authService.GenerateToken(request);
 
             if (result.Equals("Usuário não encontrado!") || result.Equals("Senha incorreta!"))
             {
                 return Unauthorized(new { result });
             }
+            return Ok(new { result });
+        }
+
+        /// <summary>
+        /// Refreshes the token.
+        /// </summary>
+        /// <param name="token">The token.</param>
+        /// <returns></returns>
+        [HttpPost("refresh")]
+        public async Task<IActionResult> RefreshToken([FromBody] string token)
+        {
+            var result = await _authService.KeepAliveToken(token);
+
             return Ok(new { result });
         }
     }

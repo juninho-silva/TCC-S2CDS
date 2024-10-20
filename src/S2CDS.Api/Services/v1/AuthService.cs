@@ -1,14 +1,15 @@
 ﻿using S2CDS.Api.Dtos.v1.Authentication;
 using S2CDS.Api.Helpers;
-using S2CDS.Api.Infrastruture.Repositories.User;
-using S2CDS.Api.Infrastruture.Services.Authentication;
+using S2CDS.Api.Infrastructure.Repositories.User;
+using S2CDS.Api.Infrastructure.Services.Authentication;
+using S2CDS.Api.Services.v1.Interfaces;
 
 namespace S2CDS.Api.Services.v1
 {
     /// <summary>
     /// AuthBusiness
     /// </summary>
-    public class AuthService
+    public class AuthService : IAuthService
     {
         private readonly ILogger<AuthService> _logger;
         private readonly IUserRepository _userRepository;
@@ -29,7 +30,7 @@ namespace S2CDS.Api.Services.v1
         /// Generates the token.
         /// </summary>
         /// <param name="request">The authentication.</param>
-        public async Task<string> GenerateToken(AuthenticationDto request)
+        public async Task<string> GenerateToken(AuthenticationRequest request)
         {
             try
             {
@@ -61,7 +62,7 @@ namespace S2CDS.Api.Services.v1
         {
             try
             {
-                return token;
+                return await Task.FromResult(token);
             }
             catch (Exception err)
             {

@@ -1,40 +1,38 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using S2CDS.Api.Dtos.v1.Donor.Requests;
-using S2CDS.Api.Infrastructure.Repositories.Donor;
+using S2CDS.Api.Dtos.v1.Organization.Requests;
 using S2CDS.Api.Services.v1.Interfaces;
 
 namespace S2CDS.Api.Controllers.v1
 {
     /// <summary>
-    /// Donor Controller
+    /// Organization Controller
     /// </summary>
     /// <seealso cref="ControllerBase" />
-    [Route("api/v1/donor")]
+    [Route("api/v1/organization")]
     [ApiController]
-    public class DonorController : ControllerBase
+    public class OrganizationController : ControllerBase
     {
-        private readonly IDonorService _donorService;
+        private readonly IOrganizationService _organizationService;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DonorController"/> class.
+        /// Initializes a new instance of the <see cref="OrganizationController"/> class.
         /// </summary>
-        /// <param name="donorService">The donor service.</param>
-        public DonorController(IDonorService donorService)
+        public OrganizationController(IOrganizationService organizationService)
         {
-            _donorService = donorService;
+            _organizationService = organizationService;
         }
 
         /// <summary>
         /// Gets this instance.
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
+        [HttpGet()]
         [Authorize]
         public async Task<IActionResult> Get()
         {
-            List<DonorEntity> entities = await _donorService.GetAll();
-            return Ok(entities);
+            var result = await _organizationService.GetAll();
+            return Ok(result);
         }
 
         /// <summary>
@@ -46,8 +44,8 @@ namespace S2CDS.Api.Controllers.v1
         [Authorize]
         public async Task<IActionResult> Get([FromRoute] string id)
         {
-            var entity = await _donorService.GetById(id);
-            return Ok(entity);
+            var result = await _organizationService.GetById(id);
+            return Ok(result);
         }
 
         /// <summary>
@@ -55,12 +53,18 @@ namespace S2CDS.Api.Controllers.v1
         /// </summary>
         /// <param name="entity">The entity.</param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPost()]
         [AllowAnonymous]
-        public async Task<IActionResult> Post([FromBody] CreateDonorRequest entity)
+        public async Task<IActionResult> Post([FromBody] CreateOrganizationRequest entity)
         {
-            await _donorService.Create(entity);
-            return Created(nameof(Post), new { message = "Doador criado!" });
+            var ok = await _organizationService.Create(entity);
+
+            if (ok)
+                return Created(nameof(Post), new { 
+                    message = "the user organization created!" 
+                });
+
+            return BadRequest();
         }
 
         /// <summary>
@@ -71,10 +75,16 @@ namespace S2CDS.Api.Controllers.v1
         /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> Put([FromRoute] string id, [FromBody] CreateDonorRequest entity)
+        public async Task<IActionResult> Put([FromRoute] string id, [FromBody] UpdateOrganizationRequest entity)
         {
-            await _donorService.Update(id, entity);
-            return NoContent();
+            var ok = await _organizationService.Update(id, entity);
+
+            if (ok)
+                return Ok(new {
+                    message = "the user organization updated!"
+                });
+
+            return BadRequest();
         }
 
         /// <summary>
@@ -87,14 +97,14 @@ namespace S2CDS.Api.Controllers.v1
         public async Task<IActionResult> Delete([FromRoute] string id)
         {
             if (string.IsNullOrWhiteSpace(id))
-                return BadRequest(new { message = "O id deve ser informado" });
+                return BadRequest(new { message = "id is null or empty" });
 
-            var (isSuccess, message) = await _donorService.Delete(id);
+            var ok = await _organizationService.Delete(id);
 
-            if (isSuccess)
-                return Ok();
+            if (ok)
+                return Ok(new { message = "the user organization deleted!" });
 
-            return BadRequest(message);
+            return BadRequest();
         }
     }
 }

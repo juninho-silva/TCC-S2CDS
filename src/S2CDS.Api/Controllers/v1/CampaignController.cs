@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using S2CDS.Api.Dtos.v1.Campaign;
-using S2CDS.Api.Infrastruture.Repositories.Campaign;
-using S2CDS.Api.Infrastruture.Repositories.Donor;
-using S2CDS.Api.Services.v1;
+using S2CDS.Api.Services.v1.Interfaces;
 
 namespace S2CDS.Api.Controllers.v1
 {
@@ -15,18 +13,16 @@ namespace S2CDS.Api.Controllers.v1
     [ApiController]
     public class CampaignController : ControllerBase
     {
-        private readonly CampaignService _campaignBusiness;
+        private readonly ICampaignService _campaignService;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CampaignController"/> class.
         /// </summary>
-        /// <param name="campaignRepository">The repository.</param>
+        /// <param name="campaignService">The campaign service.</param>
         public CampaignController(
-            ICampaignRepository campaignRepository,
-            IDonorRepository donorRepository,
-            ILogger<CampaignService> logger,
-            IConfiguration configuration)
+            ICampaignService campaignService)
         {
-            _campaignBusiness = new CampaignService(donorRepository, campaignRepository, logger, configuration);
+            _campaignService = campaignService;
         }
 
         /// <summary>
@@ -37,7 +33,7 @@ namespace S2CDS.Api.Controllers.v1
         [Authorize]
         public async Task<IActionResult> Get()
         {
-            var entities = await _campaignBusiness.GetAll();
+            var entities = await _campaignService.GetAll();
             return Ok(entities);
         }
 
@@ -50,7 +46,7 @@ namespace S2CDS.Api.Controllers.v1
         [Authorize]
         public async Task<IActionResult> Get(string id)
         {
-            var entity = await _campaignBusiness.GetById(id);
+            var entity = await _campaignService.GetById(id);
             if (entity == null)
             {
                 return NotFound();
@@ -67,7 +63,7 @@ namespace S2CDS.Api.Controllers.v1
         [Authorize]
         public async Task<IActionResult> Post([FromBody] CampaignDto entity)
         {
-            await _campaignBusiness.Create(entity);
+            await _campaignService.Create(entity);
             return Created(nameof(Post), new { message = "Campanha criado!" });
         }
 
@@ -81,7 +77,7 @@ namespace S2CDS.Api.Controllers.v1
         [Authorize]
         public async Task<IActionResult> Put(string id, [FromBody] CampaignDto entity)
         {
-            await _campaignBusiness.Update(id, entity);
+            await _campaignService.Update(id, entity);
             return NoContent();
         }
 
@@ -97,7 +93,7 @@ namespace S2CDS.Api.Controllers.v1
             if (string.IsNullOrWhiteSpace(id))
                 return BadRequest(new { message = "O id deve ser informado" });
 
-            var (isSuccess, message) = await _campaignBusiness.Delete(id);
+            var (isSuccess, message) = await _campaignService.Delete(id);
 
             if (isSuccess)
                 return Ok();

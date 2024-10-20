@@ -1,15 +1,16 @@
 ﻿using S2CDS.Api.Dtos.v1.Campaign;
 using S2CDS.Api.Helpers;
-using S2CDS.Api.Infrastruture.Repositories.Campaign;
-using S2CDS.Api.Infrastruture.Repositories.Donor;
-using S2CDS.Api.Infrastruture.Services.Smtp;
+using S2CDS.Api.Infrastructure.Repositories.Campaign;
+using S2CDS.Api.Infrastructure.Repositories.Donor;
+using S2CDS.Api.Infrastructure.Services.Smtp;
+using S2CDS.Api.Services.v1.Interfaces;
 
 namespace S2CDS.Api.Services.v1
 {
     /// <summary>
     /// Campaign Business
     /// </summary>
-    public class CampaignService
+    public class CampaignService : ICampaignService
     {
         private readonly EmailService _emailService;
         private readonly ILogger<CampaignService> _logger;
