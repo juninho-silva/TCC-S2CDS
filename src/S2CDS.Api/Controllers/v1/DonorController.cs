@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using S2CDS.Api.Dtos.v1.Donor.Requests;
+using S2CDS.Api.Dtos.v1.Donor.Responses;
 using S2CDS.Api.Infrastructure.Repositories.Donor;
 using S2CDS.Api.Services.v1.Interfaces;
 
@@ -33,7 +34,7 @@ namespace S2CDS.Api.Controllers.v1
         [Authorize]
         public async Task<IActionResult> Get()
         {
-            List<DonorEntity> entities = await _donorService.GetAll();
+            List<DonorResponse> entities = await _donorService.GetAll();
             return Ok(entities);
         }
 
