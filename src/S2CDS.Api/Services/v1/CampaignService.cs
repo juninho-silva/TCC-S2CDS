@@ -38,7 +38,7 @@ namespace S2CDS.Api.Services.v1
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns></returns>
-        public async Task<bool> Create(CampaignDto request)
+        public async Task<bool> Create(CampaignRequest request)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace S2CDS.Api.Services.v1
         /// <param name="id">The identifier.</param>
         /// <param name="request">The request.</param>
         /// <returns></returns>
-        public async Task<bool> Update(string id, CampaignDto request)
+        public async Task<bool> Update(string id, CampaignRequest request)
         {
             try
             {

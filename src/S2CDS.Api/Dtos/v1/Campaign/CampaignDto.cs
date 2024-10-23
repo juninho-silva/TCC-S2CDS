@@ -6,7 +6,7 @@ namespace S2CDS.Api.Dtos.v1.Campaign
     /// <summary>
     /// Campaign View Model
     /// </summary>
-    public class CampaignDto
+    public class CampaignRequest
     {
         /// <summary>
         /// Gets or sets the title.

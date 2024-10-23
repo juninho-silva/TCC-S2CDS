@@ -10,6 +10,9 @@ using Xunit;
 
 namespace S2CDS.Test.v1
 {
+    /// <summary>
+    /// Auth Service Test
+    /// </summary>
     public class AuthServiceTest
     {
         private readonly Mock<IUserRepository> MockUserRepository = new();
@@ -31,6 +34,9 @@ namespace S2CDS.Test.v1
             );
         }
 
+        /// <summary>
+        /// Generates the token should return token when user exists.
+        /// </summary>
         [Fact]
         public async Task GenerateToken_ShouldReturnToken_WhenUserExists()
         {
@@ -57,6 +63,9 @@ namespace S2CDS.Test.v1
             Assert.NotNull(actual);
         }
 
+        /// <summary>
+        /// Generates the token should return message when user not exists.
+        /// </summary>
         [Fact]
         public async Task GenerateToken_ShouldReturnMessage_WhenUserNotExists()
         {
@@ -76,6 +85,9 @@ namespace S2CDS.Test.v1
             Assert.Equal("Usuário não encontrado!", actual);
         }
 
+        /// <summary>
+        /// Generates the token should return message when user password.
+        /// </summary>
         [Fact]
         public async Task GenerateToken_ShouldReturnMessage_WhenUserPassword()
         {

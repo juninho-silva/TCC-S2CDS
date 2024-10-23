@@ -61,7 +61,7 @@ namespace S2CDS.Api.Controllers.v1
         /// <returns></returns>
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Post([FromBody] CampaignDto entity)
+        public async Task<IActionResult> Post([FromBody] CampaignRequest entity)
         {
             await _campaignService.Create(entity);
             return Created(nameof(Post), new { message = "Campanha criado!" });
@@ -75,7 +75,7 @@ namespace S2CDS.Api.Controllers.v1
         /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> Put(string id, [FromBody] CampaignDto entity)
+        public async Task<IActionResult> Put(string id, [FromBody] CampaignRequest entity)
         {
             await _campaignService.Update(id, entity);
             return NoContent();

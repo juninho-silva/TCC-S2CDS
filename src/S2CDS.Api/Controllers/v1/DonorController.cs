@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using S2CDS.Api.Dtos.v1.Donor.Requests;
 using S2CDS.Api.Dtos.v1.Donor.Responses;
-using S2CDS.Api.Infrastructure.Repositories.Donor;
 using S2CDS.Api.Services.v1.Interfaces;
 
 namespace S2CDS.Api.Controllers.v1
